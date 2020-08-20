@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django import forms
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 
 from . import util
 
 class NewTaskForm(forms.Form):
-    search = forms.CharField()
-
+    searchForm = forms.CharField(label="Search")
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -33,22 +33,26 @@ def search(request):
     if request.method == "POST":
         form = NewTaskForm(request.POST)
         if form.is_valid():
-            searchQuery = util.get_entry( form.cleaned_data["search"] )
-            if searchQuery == None :
-                return render(request, "encyclopedia/results.html", {
-                    "query": util.list_entries()
+            searchForm = form.cleaned_data["searchForm"]
+            searchQuery = util.get_entry( searchForm )
+            if searchQuery  == None :
+                return render(request, "encyclopedia/index.html", {
+                    "entries": util.list_entries(),
+                    "form": form
                 })
             else :
-                return render(request, "encyclopedia/results.html", {
-                    searchQuery
+                return render(request, "encyclopedia/entry.html", {
+                    "entry": searchQuery,
+                    "title": searchForm
                 })
         else:
-            return render(request, "/", {
+            return render(request, "encyclopedia/index.html", {
+                "entries": util.list_entries(),
                 "form": form
             })
 
     else:
-        return render(request, "/", {
+        return render(request, "encyclopedia/index.html", {
             "form": NewTaskForm()
         })    
 
