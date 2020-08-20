@@ -30,31 +30,34 @@ def entry(request, entry_name):
         })
 
 def search(request):
-    if request.method == "POST":
-        form = NewTaskForm(request.POST)
-        if form.is_valid():
-            searchForm = form.cleaned_data["searchForm"]
-            searchQuery = util.get_entry( searchForm )
-            if searchQuery  == None :
-                return render(request, "encyclopedia/index.html", {
-                    "entries": util.list_entries(),
-                    "form": form
-                })
-            else :
-                return render(request, "encyclopedia/entry.html", {
-                    "entry": searchQuery,
-                    "title": searchForm
-                })
-        else:
-            return render(request, "encyclopedia/index.html", {
-                "entries": util.list_entries(),
-                "form": form
-            })
+    # For i in entries(list of all entries), find the matching ones 
+    # Watch lecture part about query strings and capturing that...
 
-    else:
-        return render(request, "encyclopedia/index.html", {
-            "form": NewTaskForm()
-        })    
+    # if request.method == "POST":
+    #     form = NewTaskForm(request.POST)
+    #     if form.is_valid():
+    #         searchForm = form.cleaned_data["searchForm"]
+    #         searchQuery = util.get_entry( searchForm )
+    #         if searchQuery  == None :
+    #             return render(request, "encyclopedia/index.html", {
+    #                 "entries": util.list_entries(),
+    #                 "form": form
+    #             })
+    #         else :
+    #             return render(request, "encyclopedia/entry.html", {
+    #                 "entry": searchQuery,
+    #                 "title": searchForm
+    #             })
+    #     else:
+    #         return render(request, "encyclopedia/index.html", {
+    #             "entries": util.list_entries(),
+    #             "form": form
+    #         })
+
+    # else:
+    #     return render(request, "encyclopedia/index.html", {
+    #         "form": NewTaskForm()
+    #     })    
 
 
 
