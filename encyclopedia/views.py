@@ -32,7 +32,19 @@ def entry(request, entry_name):
 def search(request):
     # For i in entries(list of all entries), find the matching ones 
     # Watch lecture part about query strings and capturing that...
+    searchQuery = request.GET['q']
+    searchResult = util.get_entry( searchQuery )
 
+    if( searchResult == None):
+        entries = util.list_entries()
+        filteredEntries = list( filter(lambda entry: searchQuery in entry, entries ))
+        print(f"entry in... {filteredEntries} ")
+        return render(request, "encyclopedia/index.html");
+    else : 
+        return render(request, "encyclopedia/entry.html", {
+            "entry": searchResult,
+            "title": searchQuery
+        });
     # if request.method == "POST":
     #     form = NewTaskForm(request.POST)
     #     if form.is_valid():
