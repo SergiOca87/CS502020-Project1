@@ -6,15 +6,11 @@ from django.http import HttpResponseRedirect
 from . import util
 
 class NewTaskForm(forms.Form):
-    searchForm = forms.CharField(label="Search")
+    createFormTitle = forms.CharField(label="Title")
+    createFormText = forms.CharField(label="Text", widget=forms.Textarea)
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
-        "entries": util.list_entries()
-    })
-
-def results(request):
-    return render(request, "encyclopedia/results.html", {
         "entries": util.list_entries()
     })
 
@@ -30,51 +26,60 @@ def entry(request, entry_name):
         })
 
 def search(request):
-    # For i in entries(list of all entries), find the matching ones 
-    # Watch lecture part about query strings and capturing that...
+    # Get the value of the URL query string from the search form
     searchQuery = request.GET['q']
     searchResult = util.get_entry( searchQuery )
 
     if( searchResult == None):
+        # Get all existing entries
         entries = util.list_entries()
-        filteredEntries = list( filter(lambda entry: searchQuery in entry, entries ))
-        print(f"entry in... {filteredEntries} ")
-        return render(request, "encyclopedia/index.html");
+
+        # Use a lambda function synthax to filter through the list, compare the searchQuery in lowercase
+        # with each of the existing items in the entries list
+        filteredEntries = list( filter(lambda entry: searchQuery.lower() in entry.lower(), entries ))
+       
+        # Return the search page with matching results
+        return render(request, "encyclopedia/search.html", {
+            "entries": filteredEntries
+        })
     else : 
+        # If search query match, simply return that entry page
         return render(request, "encyclopedia/entry.html", {
             "entry": searchResult,
             "title": searchQuery
         });
-    # if request.method == "POST":
-    #     form = NewTaskForm(request.POST)
-    #     if form.is_valid():
-    #         searchForm = form.cleaned_data["searchForm"]
-    #         searchQuery = util.get_entry( searchForm )
-    #         if searchQuery  == None :
-    #             return render(request, "encyclopedia/index.html", {
-    #                 "entries": util.list_entries(),
-    #                 "form": form
-    #             })
-    #         else :
-    #             return render(request, "encyclopedia/entry.html", {
-    #                 "entry": searchQuery,
-    #                 "title": searchForm
-    #             })
-    #     else:
-    #         return render(request, "encyclopedia/index.html", {
-    #             "entries": util.list_entries(),
-    #             "form": form
-    #         })
 
-    # else:
-    #     return render(request, "encyclopedia/index.html", {
-    #         "form": NewTaskForm()
-    #     })    
-
-
-
-# def entry(request, entry_name):
-#     return render(request, "encyclopedia/entry.html", {
-#         "entry_name": entry_name
+# def resuts(request):
+#     return render(request, "encyclopedia/results.html", {
+#         "entries": entries
 #     })
 
+def create(request):
+    if(request.method == 'POST'):
+        form = NewTaskForm(request.POST)
+        if form.is_valid():
+            createFormTitle = form.cleaned_data['createFormTitle']
+            createFormText = form.cleaned_data['createFormText']
+
+            # First check if the entry already exists
+            if( util.get_entry( createFormTitle ) is not None):
+                return render(request, "encyclopedia/create.html", {
+                    "form": form,
+                    "error": 'Sorry, the entry already exists'
+                })
+            else :
+                util.save_entry(createFormTitle, createFormText)
+                return render(request, "encyclopedia/entry.html", {
+                    "entry": util.get_entry( createFormTitle ),
+                    "title": createFormTitle
+                });
+            # append new entry to the list we retrieve from util.get_entries...
+            # render index.html with new entry
+        else:
+            return render(request, 'encyclopedia/create.html', {
+                "form": form
+            })
+    else:
+        return render(request, "encyclopedia/create.html", {
+            "form": NewTaskForm()
+        })

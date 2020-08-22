@@ -1,0 +1,1 @@
+webpack is a module bundler. Its main purpose is to bundle JavaScript files.
