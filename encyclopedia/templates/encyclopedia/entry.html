@@ -7,8 +7,9 @@
 {% block body %}
     <h1>{{ title }}</h1>
 
-    <ul>
-        <li>{{ entry }}</li>
-    </ul>
+    <div>
+        {{ entry }}
+        <a href="/encyclopedia/edit/{{title}}">Edit this Entry</a>
+    </div>
 
 {% endblock %}

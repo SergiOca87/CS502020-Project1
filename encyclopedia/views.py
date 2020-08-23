@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django import forms
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+import random
 
 from . import util
 
@@ -49,11 +50,33 @@ def search(request):
             "title": searchQuery
         });
 
-# def resuts(request):
-#     return render(request, "encyclopedia/results.html", {
-#         "entries": entries
-#     })
+def edit(request, entry_name):
+    entry = util.get_entry( entry_name )
+    if(request.method == 'POST'):
+        modifiedEntry = request.POST['entry_content']
+        util.save_entry(entry_name, modifiedEntry)
+        return render(request, "encyclopedia/entry.html", {
+            "entry": modifiedEntry,
+            "title": entry_name
+        });
+    else:
+        return render(request, "encyclopedia/edit.html", {
+            "entry": entry,
+            "title": entry_name
+        })
 
+
+def randomPage(request): 
+    # Get the list of entries but shuffle it, to get a random one
+    entries = util.list_entries()
+    random.shuffle( entries )
+    randomEntry = entries[0]
+    
+    return render(request, "encyclopedia/entry.html", {
+        "entry": util.get_entry( randomEntry ),
+        "title": randomEntry
+    })
+    
 def create(request):
     if(request.method == 'POST'):
         form = NewTaskForm(request.POST)
@@ -73,8 +96,6 @@ def create(request):
                     "entry": util.get_entry( createFormTitle ),
                     "title": createFormTitle
                 });
-            # append new entry to the list we retrieve from util.get_entries...
-            # render index.html with new entry
         else:
             return render(request, 'encyclopedia/create.html', {
                 "form": form
