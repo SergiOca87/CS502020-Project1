@@ -3,6 +3,7 @@ from django import forms
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 import random
+import markdown2
 
 from . import util
 
@@ -17,12 +18,13 @@ def index(request):
 
     
 def entry(request, entry_name):
-    entry = util.get_entry( entry_name )
+    # We get the entry by name and we also convert markdown to HTML
+    entry = markdown2.markdown( util.get_entry( entry_name ) )
     if entry == None :
         return render(request, "encyclopedia/404.html")
     else :
         return render(request, "encyclopedia/entry.html", {
-            "entry": util.get_entry( entry_name ),
+            "entry": entry,
             "title": entry_name
         })
 

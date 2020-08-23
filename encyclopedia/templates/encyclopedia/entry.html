@@ -5,10 +5,9 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{ title }}</h1>
 
     <div>
-        {{ entry }}
+        {{ entry |safe }}
         <a href="/encyclopedia/edit/{{title}}">Edit this Entry</a>
     </div>
 
