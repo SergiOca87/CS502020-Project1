@@ -47,13 +47,15 @@ def search(request):
         })
     else : 
         # If search query match, simply return that entry page
+
+        convertedSearchResult = markdown2.markdown( searchResult )
         return render(request, "encyclopedia/entry.html", {
-            "entry": searchResult,
+            "entry": convertedSearchResult,
             "title": searchQuery
         });
 
 def edit(request, entry_name):
-    entry = util.get_entry( entry_name )
+    entry =  markdown2.markdown(util.get_entry( entry_name ))
     if(request.method == 'POST'):
         modifiedEntry = request.POST['entry_content']
         util.save_entry(entry_name, modifiedEntry)
@@ -75,7 +77,7 @@ def randomPage(request):
     randomEntry = entries[0]
     
     return render(request, "encyclopedia/entry.html", {
-        "entry": util.get_entry( randomEntry ),
+        "entry":  markdown2.markdown(util.get_entry( randomEntry )),
         "title": randomEntry
     })
     
